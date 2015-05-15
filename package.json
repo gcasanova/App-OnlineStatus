@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/gcasanova/PlanOut-OnlineStatus/issues"
   },
-  "homepage": "https://github.com/gcasanova/PlanOut-OnlineStatus"
+  "homepage": "https://github.com/gcasanova/PlanOut-OnlineStatus",
+  "dependencies": {
+    "mqtt": "^1.1.5"
+  }
 }

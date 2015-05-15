@@ -1,0 +1,9 @@
+aws.access.key=xxxx
+aws.secret.key=xxxx
+aws.s3.bucket.name.logs=xxxx
+aws.dynamodb.table=xxxx
+mqtt.topic=xxxx
+mqtt.host=xxxx
+mqtt.port=xxxx
+mqtt.username=xxxx
+mqtt.password=xxxx
