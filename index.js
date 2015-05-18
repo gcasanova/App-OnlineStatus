@@ -1,15 +1,15 @@
 var fs = require('fs');
 var mqtt = require('mqtt');
+var redis = require("redis");
 var aws = require('aws-sdk');
 var propertiesReader = require('properties-reader');
 var properties = propertiesReader('properties.file');
 
-var dynamodb = new aws.DynamoDB();
+var redisClient = redis.createClient();
 
 // properties
 var AWS_ACCESS_KEY_ID = properties.get('aws.access.key.production');
 var AWS_SECRET_ACCESS_KEY = properties.get('aws.secret.key.production');
-var AWS_DYNAMODB_TABLE = properties.get('aws.dynamodb.table');
 var AWS_BUCKET_NAME_LOGS = properties.get('aws.s3.bucket.name.logs');
 var MQTT_HOST = properties.get('mqtt.host');
 var MQTT_PORT = properties.get('mqtt.port');
@@ -94,26 +94,16 @@ client.on('connect', function () {
 
 client.on('message', function (topic, message) {
 	if (message.toString() === "CONNECTED") {
-		updateApi(topic.split("/")[2], 1);
+		logDebug("Connecting user with id: " + topic.split("/")[2])
+		redisClient.set(topic.split("/")[2] + "/ONLINE", true);
+		redisClient.expire(topic.split("/")[2] + "/ONLINE", 36000); // 10 hours expiration
 	} else if (message.toString() === "DISCONNECTED") {
-		updateApi(topic.split("/")[2], 0);
+		logDebug("Disconnecting user with id: " + topic.split("/")[2])
+		redisClient.del(topic.split("/")[2] + "/ONLINE");
+		redisClient.set(topic.split("/")[2] + "/LAST_SEEN", new Date().getTime());
 	}
 });
 
-// update item api's
-var updateApi = limit(function(id, isOnline) {
-	dynamodb.updateItem({
-    	"Key": {
-	    	"Id": id
-    	},
-		TableName: AWS_DYNAMODB_TABLE,
-	    "UpdateExpression": "SET IsOnline = :a",
-	    "ExpressionAttributeValues" : {
-	    	":a" : {"N":isOnline}
-	    }
-	}, function(err, data) {
-	  	if (err) {
-				logError("Update item to dynamodb failed: " + err);
-			}
-	});
-}).to(5).per(1000);
+var interval = setInterval(function() {
+	uploadLogs();
+}, 3600000);
