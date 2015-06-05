@@ -87,7 +87,11 @@ function uploadLogs() {
 	});
 }
 
-var client  = mqtt.connect('mqtt://' + MQTT_HOST + ':' + MQTT_PORT);
+var client  = mqtt.connect('mqtt://' + MQTT_HOST + ':' + MQTT_PORT, {
+  username: MQTT_USERNAME,
+  password: MQTT_PASSWORD
+});
+
 client.on('connect', function () {
 	client.subscribe(MQTT_TOPIC);
 });
