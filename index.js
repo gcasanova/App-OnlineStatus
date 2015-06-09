@@ -98,13 +98,13 @@ client.on('connect', function () {
 
 client.on('message', function (topic, message) {
 	if (message.toString() === "CONNECTED") {
-		logDebug("Connecting user with id: " + topic.split("/")[2])
-		redisClient.set(topic.split("/")[2] + "/ONLINE", true);
-		redisClient.expire(topic.split("/")[2] + "/ONLINE", 36000); // 10 hours expiration
+		logDebug("Connecting user with id: " + topic.split("/")[3])
+		redisClient.set(topic.split("/")[3] + "/ONLINE", true);
+		redisClient.expire(topic.split("/")[3] + "/ONLINE", 36000); // 10 hours expiration
 	} else if (message.toString() === "DISCONNECTED") {
-		logDebug("Disconnecting user with id: " + topic.split("/")[2])
-		redisClient.del(topic.split("/")[2] + "/ONLINE");
-		redisClient.set(topic.split("/")[2] + "/LAST_SEEN", new Date().getTime());
+		logDebug("Disconnecting user with id: " + topic.split("/")[3])
+		redisClient.del(topic.split("/")[3] + "/ONLINE");
+		redisClient.set(topic.split("/")[3] + "/LAST_SEEN", new Date().getTime());
 	}
 });
 
